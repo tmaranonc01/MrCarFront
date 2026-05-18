@@ -1,0 +1,89 @@
+<section class="page-shell">
+  <header class="page-head">
+    <h1 class="page-title">Admin coches</h1>
+    <p class="page-subtitle">Gestion de marcas, modelos y datos tecnicos.</p>
+  </header>
+
+  <p-message *ngIf="error" severity="error" [text]="error"></p-message>
+
+  <div class="page-tools">
+    <button pButton type="button" icon="pi pi-plus" label="Nuevo coche" (click)="nuevo()"></button>
+  </div>
+
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="table-shell">
+    <p-table
+      [value]="coches"
+      [loading]="cargando"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[5,10,20]"
+      responsiveLayout="scroll"
+      [tableStyle]="{ 'min-width': '750px' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Marca</th>
+          <th>Modelo</th>
+          <th style="width:120px;">Anio</th>
+          <th>Motor</th>
+          <th style="width:240px;">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-c>
+        <tr>
+          <td><b>{{ c.marca }}</b></td>
+          <td>{{ c.modelo }}</td>
+          <td>{{ c.anio ?? '-' }}</td>
+          <td>{{ c.motor ?? '-' }}</td>
+          <td class="row-actions">
+            <button pButton type="button" icon="pi pi-pencil" label="Editar" class="p-button-text" (click)="editar(c)"></button>
+            <button pButton type="button" icon="pi pi-trash" label="Borrar" severity="danger" (click)="confirmarBorrar(c)"></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5">No hay coches.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</section>
+
+<p-dialog
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [style]="{ width: 'min(520px, 94vw)' }"
+  [header]="editandoId ? 'Editar coche' : 'Nuevo coche'"
+>
+  <div class="form-stack">
+    <div>
+      <label class="form-label">Marca</label>
+      <input pInputText [(ngModel)]="form.marca" style="width:100%;" />
+    </div>
+
+    <div>
+      <label class="form-label">Modelo</label>
+      <input pInputText [(ngModel)]="form.modelo" style="width:100%;" />
+    </div>
+
+    <div>
+      <label class="form-label">Anio</label>
+      <p-inputNumber [(ngModel)]="form.anio" [useGrouping]="false" styleClass="w-full"></p-inputNumber>
+    </div>
+
+    <div>
+      <label class="form-label">Motor</label>
+      <input pInputText [(ngModel)]="form.motor" style="width:100%;" placeholder="Ej: 1.9 TDI" />
+    </div>
+
+    <div class="form-actions">
+      <button pButton type="button" label="Cancelar" severity="secondary" (click)="dialogVisible=false"></button>
+      <button pButton type="button" label="Guardar" icon="pi pi-check" (click)="guardar()"></button>
+    </div>
+  </div>
+</p-dialog>

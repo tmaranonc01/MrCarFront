@@ -1,0 +1,79 @@
+<section class="home-page">
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">MrCar</p>
+      <h1>Piezas que hacen que tu coche se note</h1>
+      <p>
+        Descubre catalogo, compara opciones y monta mejoras con una experiencia mas visual y
+        directa.
+      </p>
+
+      <div class="hero-actions">
+        <a class="btn btn-solid" routerLink="/piezas">Ver piezas</a>
+
+        <a *ngIf="!token.isLogged()" class="btn btn-outline" routerLink="/login">Iniciar sesion</a>
+        <a *ngIf="token.isLogged()" class="btn btn-outline" routerLink="/deseos">Mis deseos</a>
+      </div>
+    </div>
+
+    <div class="hero-image">
+      <img
+        src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1600&q=80"
+        alt="Coche deportivo en carretera"
+      />
+    </div>
+  </header>
+
+  <section class="intro">
+    <p>
+      Desde piezas de rendimiento hasta upgrades de confort. Todo listo para encontrar rapido lo
+      que necesita tu coche.
+    </p>
+  </section>
+
+  <section class="car-selector">
+    <div>
+      <h2>Buscar piezas por coche</h2>
+      <p>Selecciona tu coche y entra directo al listado con el filtro aplicado.</p>
+    </div>
+
+    <div class="car-selector-controls">
+      <p-select
+        [options]="cochesOpciones"
+        [(ngModel)]="cocheSeleccionadoId"
+        optionLabel="label"
+        optionValue="id"
+        [filter]="true"
+        [loading]="cargandoCoches"
+        placeholder="Selecciona un coche"
+        styleClass="w-full"
+      ></p-select>
+
+      <button
+        pButton
+        type="button"
+        label="Ver piezas"
+        icon="pi pi-arrow-right"
+        [disabled]="!cocheSeleccionadoId"
+        (click)="irAPiezasDeCoche()"
+      ></button>
+    </div>
+
+    <p *ngIf="errorCoches" class="car-selector-error">{{ errorCoches }}</p>
+  </section>
+
+  <section class="cards-grid">
+    <article class="card" *ngFor="let card of cards">
+      <img [src]="card.imagen" [alt]="card.titulo" />
+      <div class="card-body">
+        <h3>{{ card.titulo }}</h3>
+        <p>{{ card.texto }}</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="cta">
+    <h2>Empieza ahora con tus proximas mejoras</h2>
+    <a class="btn btn-solid" routerLink="/piezas">Ir al catalogo</a>
+  </section>
+</section>

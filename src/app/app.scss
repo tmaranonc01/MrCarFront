@@ -1,0 +1,23 @@
+.top {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  align-items: center;
+}
+
+.top a {
+  text-decoration: none;
+}
+
+.top a.active {
+  font-weight: 700;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.contenedor {
+  padding: 16px;
+}

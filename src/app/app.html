@@ -1,0 +1,53 @@
+<p-toolbar>
+  <ng-template pTemplate="start">
+    <div class="top-nav-start">
+      <button type="button" class="nav-btn" (click)="go('/')">Inicio</button>
+      <button type="button" class="nav-btn" (click)="go('/piezas')">Piezas</button>
+
+      <button
+        *ngIf="token.isLogged()"
+        type="button"
+        class="nav-btn"
+        (click)="go('/deseos')"
+      >
+        Deseos
+      </button>
+
+      <button
+        *ngIf="token.isAdmin()"
+        type="button"
+        class="nav-btn"
+        (click)="go('/admin/coches')"
+      >
+        Admin coches
+      </button>
+      <button
+        *ngIf="token.isAdmin()"
+        type="button"
+        class="nav-btn"
+        (click)="go('/admin/piezas')"
+      >
+        Admin piezas
+      </button>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="end">
+    <div class="top-nav-end">
+      <ng-container *ngIf="token.isLogged(); else noLogin">
+        <span class="user-email">{{ token.getEmail() }}</span>
+        <p-tag [value]="token.getRol() || ''" severity="info"></p-tag>
+        <button type="button" class="nav-btn" (click)="logout()">Salir</button>
+      </ng-container>
+
+      <ng-template #noLogin>
+        <button type="button" class="nav-btn nav-btn-outline" (click)="go('/login')">Login</button>
+        <button type="button" class="nav-btn nav-btn-outline" (click)="go('/registro')">Registro</button>
+      </ng-template>
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<div class="app-content">
+  <router-outlet></router-outlet>
+</div>

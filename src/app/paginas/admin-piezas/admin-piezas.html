@@ -1,0 +1,121 @@
+<section class="page-shell">
+  <header class="page-head">
+    <h1 class="page-title">Admin piezas</h1>
+    <p class="page-subtitle">Alta, edicion y control de stock del catalogo.</p>
+  </header>
+
+  <p-message *ngIf="error" severity="error" [text]="error"></p-message>
+
+  <div class="page-tools">
+    <button pButton type="button" icon="pi pi-plus" label="Nueva pieza" (click)="nuevo()"></button>
+  </div>
+
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="table-shell">
+    <p-table
+      [value]="piezas"
+      [loading]="cargando"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[5,10,20]"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nombre</th>
+          <th style="width:120px;">Precio</th>
+          <th style="width:160px;">Estado</th>
+          <th style="width:100px;">Stock</th>
+          <th style="width:240px;">Coche</th>
+          <th style="width:240px;">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-p>
+        <tr>
+          <td><b>{{ p.nombre }}</b></td>
+          <td>{{ p.precio }} EUR</td>
+          <td><p-tag [value]="p.estado" [severity]="sevEstado(p.estado)"></p-tag></td>
+          <td>{{ p.stock }}</td>
+          <td>{{ p.coche?.marca ?? '' }} {{ p.coche?.modelo ?? '' }}</td>
+          <td class="row-actions">
+            <button pButton type="button" icon="pi pi-pencil" label="Editar" class="p-button-text" (click)="editar(p)"></button>
+            <button pButton type="button" icon="pi pi-trash" label="Borrar" severity="danger" (click)="confirmarBorrar(p)"></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr><td colspan="6">No hay piezas.</td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+</section>
+
+<p-dialog
+  [(visible)]="dialog"
+  [modal]="true"
+  [style]="{ width: 'min(720px, 94vw)' }"
+  [header]="editandoId ? 'Editar pieza' : 'Nueva pieza'"
+>
+  <div class="form-stack">
+    <div>
+      <label class="form-label">Nombre</label>
+      <input pInputText [(ngModel)]="form.nombre" style="width:100%;" />
+    </div>
+
+    <div>
+      <label class="form-label">Descripcion</label>
+      <textarea pTextarea [(ngModel)]="form.descripcion" rows="3" style="width:100%;"></textarea>
+    </div>
+
+    <div class="field-grid">
+      <div>
+        <label class="form-label">Precio (EUR)</label>
+        <p-inputNumber [(ngModel)]="form.precio" [minFractionDigits]="2" [maxFractionDigits]="2" styleClass="w-full"></p-inputNumber>
+      </div>
+
+      <div>
+        <label class="form-label">Stock</label>
+        <p-inputNumber [(ngModel)]="form.stock" [useGrouping]="false" [min]="0" styleClass="w-full"></p-inputNumber>
+      </div>
+    </div>
+
+    <div class="field-grid">
+      <div>
+        <label class="form-label">Estado</label>
+        <p-select [options]="estados" [(ngModel)]="form.estado" optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
+      </div>
+
+      <div>
+        <label class="form-label">Coche</label>
+        <p-select
+          [options]="coches"
+          [(ngModel)]="form.cocheId"
+          [filter]="true"
+          optionLabel="marca"
+          optionValue="id"
+          styleClass="w-full"
+        >
+          <ng-template pTemplate="item" let-c>
+            {{ etiquetaCoche(c) }}
+          </ng-template>
+          <ng-template pTemplate="selectedItem" let-c>
+            <span *ngIf="c">{{ etiquetaCoche(c) }}</span>
+          </ng-template>
+        </p-select>
+      </div>
+    </div>
+
+    <div>
+      <label class="form-label">Imagen URL</label>
+      <input pInputText [(ngModel)]="form.imagenUrl" style="width:100%;" placeholder="https://..." />
+    </div>
+
+    <div class="form-actions">
+      <button pButton type="button" label="Cancelar" severity="secondary" (click)="dialog=false"></button>
+      <button pButton type="button" label="Guardar" icon="pi pi-check" (click)="guardar()"></button>
+    </div>
+  </div>
+</p-dialog>

@@ -1,0 +1,122 @@
+<section class="page-shell">
+  <header class="page-head">
+    <h1 class="page-title">Piezas</h1>
+    <p class="page-subtitle">
+      Catalogo visual para buscar por nombre y revisar detalles.
+      <ng-container *ngIf="cocheFiltroId">
+        Filtrado por coche:
+        <b>{{ cocheFiltroNombre || ('ID ' + cocheFiltroId) }}</b>
+      </ng-container>
+    </p>
+  </header>
+
+  <p *ngIf="error" class="page-error">{{ error }}</p>
+
+  <div class="page-tools">
+    <span class="p-input-icon-left search-grow">
+      <i class="pi pi-search"></i>
+      <input pInputText type="text" placeholder="Buscar por nombre..." [(ngModel)]="filtroGlobal" style="width:100%;" />
+    </span>
+
+    <button
+      *ngIf="cocheFiltroId"
+      pButton
+      type="button"
+      label="Quitar filtro coche"
+      icon="pi pi-filter-slash"
+      severity="secondary"
+      (click)="limpiarFiltroCoche()"
+    ></button>
+  </div>
+
+  <div class="table-shell">
+    <p-table
+      #dt
+      [value]="piezas"
+      [loading]="cargando"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[5,10,20]"
+      [globalFilterFields]="['nombre']"
+      [tableStyle]="{ 'min-width': '700px' }"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="caption">
+        <div class="table-caption">
+          <span class="table-total">Total: {{ piezas.length }}</span>
+          <span class="table-filter-hook">{{ dt.filterGlobal(filtroGlobal, 'contains') }}</span>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="nombre">
+            Nombre <p-sortIcon field="nombre"></p-sortIcon>
+          </th>
+          <th style="width:140px;" pSortableColumn="precio">
+            Precio <p-sortIcon field="precio"></p-sortIcon>
+          </th>
+          <th style="width:140px;">Estado</th>
+          <th style="width:240px;">Coche</th>
+          <th style="width:360px;">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-p>
+        <tr>
+          <td><b>{{ p.nombre }}</b></td>
+          <td>{{ p.precio }} EUR</td>
+          <td>
+            <p-tag [value]="p.estado" severity="info"></p-tag>
+          </td>
+          <td>{{ p.coche?.marca ?? '' }} {{ p.coche?.modelo ?? '' }}</td>
+          <td class="row-actions">
+            <button
+              pButton
+              type="button"
+              class="p-button-text"
+              icon="pi pi-eye"
+              label="Ver"
+              [routerLink]="['/piezas', p.id]"
+            ></button>
+
+            <a
+              *ngIf="!token.isLogged()"
+              pButton
+              class="p-button-outlined"
+              icon="pi pi-sign-in"
+              label="Login"
+              routerLink="/login"
+            ></a>
+
+            <button
+              *ngIf="token.isLogged() && !enDeseos(p.id)"
+              pButton
+              icon="pi pi-heart"
+              label="Anadir a deseos"
+              severity="success"
+              (click)="agregarADeseos(p.id)"
+            ></button>
+
+            <ng-container *ngIf="token.isLogged() && enDeseos(p.id)">
+              <p-tag value="En deseos" severity="success"></p-tag>
+              <button
+                pButton
+                icon="pi pi-times"
+                label="Quitar"
+                severity="secondary"
+                (click)="quitarDeDeseos(p.id)"
+              ></button>
+            </ng-container>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5">No hay piezas.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</section>

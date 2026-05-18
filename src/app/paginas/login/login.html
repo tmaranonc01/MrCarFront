@@ -1,0 +1,46 @@
+<section class="page-shell auth-page">
+  <header class="page-head">
+    <h1 class="page-title">Iniciar sesion</h1>
+    <p class="page-subtitle">Accede para guardar deseos y administrar contenido.</p>
+  </header>
+
+  <div class="auth-card">
+    <p-card>
+      <p-message *ngIf="error" severity="error" [text]="error"></p-message>
+
+      <div class="form-stack">
+        <div>
+          <label class="form-label">Email</label>
+          <input pInputText [(ngModel)]="email" placeholder="usuario@mrcar.com" style="width:100%;" />
+        </div>
+
+        <div>
+          <label class="form-label">Contrasena</label>
+          <p-password
+            [(ngModel)]="password"
+            [toggleMask]="true"
+            [feedback]="false"
+            placeholder="******"
+            styleClass="w-full"
+          ></p-password>
+        </div>
+
+        <button
+          pButton
+          type="button"
+          label="Entrar"
+          icon="pi pi-sign-in"
+          [loading]="cargando"
+          (click)="entrar()"
+        ></button>
+
+        <p-divider></p-divider>
+
+        <div class="auth-links">
+          <span>No tienes cuenta?</span>
+          <a routerLink="/registro">Crear cuenta</a>
+        </div>
+      </div>
+    </p-card>
+  </div>
+</section>

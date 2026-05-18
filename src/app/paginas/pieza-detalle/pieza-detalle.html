@@ -1,0 +1,59 @@
+<section class="page-shell">
+  <div class="page-tools">
+    <button pButton type="button" icon="pi pi-arrow-left" label="Volver" class="p-button-text" (click)="volver()"></button>
+  </div>
+
+  <div *ngIf="cargando" class="loading-row">
+    <p-progressSpinner strokeWidth="4" styleClass="w-2rem h-2rem"></p-progressSpinner>
+    <span>Cargando detalle...</span>
+  </div>
+
+  <p *ngIf="error" class="page-error">{{ error }}</p>
+
+  <p-card *ngIf="!cargando && !error && pieza">
+    <ng-template pTemplate="title">{{ pieza.nombre }}</ng-template>
+    <ng-template pTemplate="subtitle">{{ pieza.precio }} EUR</ng-template>
+
+    <div class="tag-row">
+      <p-tag [value]="pieza.estado" [severity]="severidadEstado(pieza.estado)"></p-tag>
+      <p-tag
+        *ngIf="pieza.coche"
+        [value]="(pieza.coche.marca ?? '') + ' ' + (pieza.coche.modelo ?? '')"
+        severity="info"
+      ></p-tag>
+    </div>
+
+    <p-divider></p-divider>
+
+    <p class="detail-field"><b>Stock:</b> {{ pieza.stock }}</p>
+    <p class="detail-field"><b>Descripcion:</b> {{ pieza.descripcion || '-' }}</p>
+
+    <div *ngIf="pieza.imagenUrl" class="detail-media">
+      <img [src]="pieza.imagenUrl" loading="lazy" (error)="pieza!.imagenUrl = null" />
+    </div>
+
+    <p-divider></p-divider>
+
+    <div class="row-actions">
+      <button
+        *ngIf="token.isLogged()"
+        pButton
+        type="button"
+        icon="pi pi-heart"
+        label="Anadir a deseos"
+        severity="success"
+        [disabled]="cambiandoDeseo"
+        (click)="agregarADeseos()"
+      ></button>
+
+      <a
+        *ngIf="!token.isLogged()"
+        pButton
+        class="p-button-outlined"
+        icon="pi pi-sign-in"
+        label="Login para guardar"
+        routerLink="/login"
+      ></a>
+    </div>
+  </p-card>
+</section>

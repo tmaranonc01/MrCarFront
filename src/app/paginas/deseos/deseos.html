@@ -1,0 +1,39 @@
+<section class="page-shell">
+  <header class="page-head">
+    <h1 class="page-title">Mis deseos</h1>
+    <p class="page-subtitle">Guarda piezas para revisarlas mas tarde.</p>
+  </header>
+
+  <p *ngIf="error" class="page-error">{{ error }}</p>
+
+  <div class="table-shell">
+    <p-table [value]="deseos" [loading]="cargando" responsiveLayout="scroll">
+      <ng-template pTemplate="loading">
+        <div class="loading-row">
+          <p-progressSpinner strokeWidth="4" styleClass="w-2rem h-2rem"></p-progressSpinner>
+          <span>Cargando deseos...</span>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Pieza</th>
+          <th style="width:140px">Precio</th>
+          <th style="width:160px">Accion</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-d>
+        <tr>
+          <td><b>{{ d.pieza.nombre }}</b></td>
+          <td>{{ d.pieza.precio }} EUR</td>
+          <td class="row-actions">
+            <button pButton label="Quitar" icon="pi pi-trash" severity="danger" (click)="quitar(d.pieza.id)"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <p *ngIf="!cargando && !error && deseos.length === 0" class="empty-note">No tienes deseos todavia.</p>
+</section>
