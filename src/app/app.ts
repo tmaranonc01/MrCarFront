@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { TokenService } from './servicios/token';
+import { CochesService } from './servicios/coches';
 import { TagModule } from 'primeng/tag';
 
 @Component({
@@ -10,8 +11,21 @@ import { TagModule } from 'primeng/tag';
   imports: [CommonModule, RouterOutlet, RouterLink, TagModule],
   templateUrl: './app.html',
 })
-export class App {
-  constructor(public token: TokenService, private router: Router) {}
+export class App implements OnInit {
+  constructor(
+    public token: TokenService,
+    private router: Router,
+    private cochesApi: CochesService
+  ) {}
+
+  ngOnInit() {
+    // Despierta el backend tras inactividad para evitar "primer click sin datos".
+    this.cochesApi.listar(true).subscribe({
+      error: () => {
+        // Silencioso: cada pantalla ya maneja sus propios reintentos.
+      },
+    });
+  }
 
   async logout() {
     this.token.clear();

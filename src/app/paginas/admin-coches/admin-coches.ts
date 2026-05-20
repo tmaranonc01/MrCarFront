@@ -33,7 +33,7 @@ import { ConfirmationService } from 'primeng/api';
   templateUrl: './admin-coches.html',
 })
 export class AdminCoches implements OnInit {
-  private readonly maxIntentosCarga = 4;
+  private readonly maxIntentosCarga = 10;
 
   coches: Coche[] = [];
   cargando = false;
@@ -71,7 +71,7 @@ export class AdminCoches implements OnInit {
             (status === 0 || status === 401 || status === 403 || status >= 500);
 
           if (shouldRetry) {
-            const waitMs = 300 + intento * 350;
+            const waitMs = Math.min(1000 + intento * 700, 4500);
             this.cargando = true;
             setTimeout(() => this.cargar(intento + 1), waitMs);
             return;

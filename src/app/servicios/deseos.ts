@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Pieza } from './piezas';
-import { TokenService } from './token';
 
 export interface Deseo {
   id: number;
@@ -14,7 +13,7 @@ export interface Deseo {
 export class DeseosService {
   private baseUrl = '/api/deseos';
 
-  constructor(private http: HttpClient, private token: TokenService) {}
+  constructor(private http: HttpClient) {}
 
   private withNoCache(url: string, forceRefresh: boolean): string {
     if (!forceRefresh) return url;
@@ -22,29 +21,16 @@ export class DeseosService {
     return `${url}${sep}_=${Date.now()}`;
   }
 
-  private paramsConEmailSiExiste(): HttpParams | undefined {
-    const email = this.token.getEmail?.() ?? null;
-    if (!email) return undefined;
-    return new HttpParams().set('email', email.trim().toLowerCase());
-  }
-
   listar(): Observable<Deseo[]> {
-    const params = this.paramsConEmailSiExiste();
     // En datos por usuario forzamos no-cache para evitar primera respuesta stale.
-    return this.http.get<Deseo[]>(
-      this.withNoCache(this.baseUrl, true),
-      params ? { params } : {}
-    );
+    return this.http.get<Deseo[]>(this.withNoCache(this.baseUrl, true));
   }
 
   agregar(piezaId: number): Observable<void> {
-    const params = this.paramsConEmailSiExiste();
-    // body null para no liarla con content-type
-    return this.http.post<void>(`${this.baseUrl}/${piezaId}`, null, params ? { params } : {});
+    return this.http.post<void>(`${this.baseUrl}/${piezaId}`, null);
   }
 
   quitar(piezaId: number): Observable<void> {
-    const params = this.paramsConEmailSiExiste();
-    return this.http.delete<void>(`${this.baseUrl}/${piezaId}`, params ? { params } : {});
+    return this.http.delete<void>(`${this.baseUrl}/${piezaId}`);
   }
 }

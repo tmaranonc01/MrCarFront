@@ -40,7 +40,7 @@ import { SelectModule } from 'primeng/select';
   templateUrl: './admin-piezas.html',
 })
 export class AdminPiezas implements OnInit {
-  private readonly maxIntentosCarga = 4;
+  private readonly maxIntentosCarga = 10;
 
   piezas: Pieza[] = [];
   coches: Coche[] = [];
@@ -103,7 +103,7 @@ export class AdminPiezas implements OnInit {
             (status === 0 || status === 401 || status === 403 || status >= 500);
 
           if (shouldRetry) {
-            const waitMs = 300 + intento * 350;
+            const waitMs = Math.min(1000 + intento * 700, 4500);
             this.cargando = true;
             setTimeout(() => this.cargarTodo(intento + 1), waitMs);
             return;

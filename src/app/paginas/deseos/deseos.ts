@@ -15,7 +15,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
   templateUrl: './deseos.html',
 })
 export class Deseos implements OnInit {
-  private readonly maxIntentosCarga = 4;
+  private readonly maxIntentosCarga = 10;
 
   deseos: Deseo[] = [];
   cargando = false;
@@ -43,7 +43,7 @@ export class Deseos implements OnInit {
             (status === 0 || status === 401 || status === 403 || status >= 500);
 
           if (shouldRetry) {
-            const waitMs = 300 + intento * 350;
+            const waitMs = Math.min(1000 + intento * 700, 4500);
             this.cargando = true;
             setTimeout(() => this.cargar(intento + 1), waitMs);
             return;
