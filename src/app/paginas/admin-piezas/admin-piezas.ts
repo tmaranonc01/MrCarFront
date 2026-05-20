@@ -40,6 +40,8 @@ import { SelectModule } from 'primeng/select';
   templateUrl: './admin-piezas.html',
 })
 export class AdminPiezas implements OnInit {
+  private readonly maxIntentosCarga = 4;
+
   piezas: Pieza[] = [];
   coches: Coche[] = [];
   cochesOpciones: { label: string; value: number }[] = [];
@@ -76,9 +78,9 @@ export class AdminPiezas implements OnInit {
     this.cargarTodo();
   }
 
-  cargarTodo(forceRefresh = false) {
+  cargarTodo(intento = 0) {
     this.error = '';
-    this.cargando = true;
+    if (intento === 0) this.cargando = true;
 
     forkJoin({
       piezas: this.piezasApi.adminListar(),
@@ -96,11 +98,17 @@ export class AdminPiezas implements OnInit {
         },
         error: (e: any) => {
           const status = Number(e?.status ?? 0);
-          const shouldRetry = !forceRefresh && (status === 0 || status === 401 || status === 403);
+          const shouldRetry =
+            intento < this.maxIntentosCarga &&
+            (status === 0 || status === 401 || status === 403 || status >= 500);
+
           if (shouldRetry) {
-            this.cargarTodo(true);
+            const waitMs = 300 + intento * 350;
+            this.cargando = true;
+            setTimeout(() => this.cargarTodo(intento + 1), waitMs);
             return;
           }
+
           this.error = `Error cargando datos: ${e?.status ?? ''} ${e?.statusText ?? ''}`.trim();
           console.error(e);
         },

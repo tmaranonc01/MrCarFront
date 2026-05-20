@@ -33,6 +33,8 @@ import { ConfirmationService } from 'primeng/api';
   templateUrl: './admin-coches.html',
 })
 export class AdminCoches implements OnInit {
+  private readonly maxIntentosCarga = 4;
+
   coches: Coche[] = [];
   cargando = false;
   error = '';
@@ -53,9 +55,9 @@ export class AdminCoches implements OnInit {
     this.cargar();
   }
 
-  cargar(forceRefresh = false) {
+  cargar(intento = 0) {
     this.error = '';
-    this.cargando = true;
+    if (intento === 0) this.cargando = true;
 
     this.cochesApi
       .adminListar()
@@ -64,11 +66,17 @@ export class AdminCoches implements OnInit {
         next: (data) => (this.coches = data ?? []),
         error: (e: any) => {
           const status = Number(e?.status ?? 0);
-          const shouldRetry = !forceRefresh && (status === 0 || status === 401 || status === 403);
+          const shouldRetry =
+            intento < this.maxIntentosCarga &&
+            (status === 0 || status === 401 || status === 403 || status >= 500);
+
           if (shouldRetry) {
-            this.cargar(true);
+            const waitMs = 300 + intento * 350;
+            this.cargando = true;
+            setTimeout(() => this.cargar(intento + 1), waitMs);
             return;
           }
+
           this.error = `Error cargando coches: ${e?.status ?? ''} ${e?.statusText ?? ''}`.trim();
           console.error(e);
         },
