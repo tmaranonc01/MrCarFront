@@ -3,13 +3,14 @@
     <a class="nav-btn" routerLink="/">Inicio</a>
     <a class="nav-btn" routerLink="/piezas">Piezas</a>
 
-    <a
+    <button
       *ngIf="token.isLoggedSignal()"
+      type="button"
       class="nav-btn"
-      routerLink="/deseos"
+      (click)="goDeseos()"
     >
       Deseos
-    </a>
+    </button>
 
     <a
       *ngIf="token.isAdminSignal()"
