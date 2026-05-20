@@ -11,6 +11,9 @@ import { TagModule } from 'primeng/tag';
   templateUrl: './app.html',
 })
 export class App {
+goAutoDouble(arg0: string,$event: TouchEvent) {
+throw new Error('Method not implemented.');
+}
   private navBurstInProgress = false;
   private lastTouchNavTs = 0;
 
