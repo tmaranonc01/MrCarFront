@@ -16,6 +16,12 @@ export class DeseosService {
 
   constructor(private http: HttpClient, private token: TokenService) {}
 
+  private withNoCache(url: string, forceRefresh: boolean): string {
+    if (!forceRefresh) return url;
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}_=${Date.now()}`;
+  }
+
   private paramsConEmailSiExiste(): HttpParams | undefined {
     const email = this.token.getEmail?.() ?? null;
     if (!email) return undefined;
@@ -24,7 +30,11 @@ export class DeseosService {
 
   listar(): Observable<Deseo[]> {
     const params = this.paramsConEmailSiExiste();
-    return this.http.get<Deseo[]>(this.baseUrl, params ? { params } : {});
+    // En datos por usuario forzamos no-cache para evitar primera respuesta stale.
+    return this.http.get<Deseo[]>(
+      this.withNoCache(this.baseUrl, true),
+      params ? { params } : {}
+    );
   }
 
   agregar(piezaId: number): Observable<void> {

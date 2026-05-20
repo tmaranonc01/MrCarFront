@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 export interface Coche {
   id: number;
@@ -40,16 +40,9 @@ export class CochesService {
   }
 
   // Admin
-  adminListar(forceRefresh = false): Observable<Coche[]> {
-    return this.http.get<Coche[]>(this.withNoCache(this.adminUrl, forceRefresh)).pipe(
-      catchError((e: HttpErrorResponse) => {
-        // Some backends block GET /admin with 403/405 but allow public GET.
-        if (e.status === 403 || e.status === 405) {
-          return this.listar(forceRefresh);
-        }
-        return throwError(() => e);
-      })
-    );
+  adminListar(): Observable<Coche[]> {
+    // En admin forzamos no-cache para evitar respuestas stale entre sesiones/roles.
+    return this.http.get<Coche[]>(this.withNoCache(this.adminUrl, true));
   }
 
   adminCrear(c: CocheCrearActualizar): Observable<Coche> {

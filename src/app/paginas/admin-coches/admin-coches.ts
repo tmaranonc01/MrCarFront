@@ -58,11 +58,17 @@ export class AdminCoches implements OnInit {
     this.cargando = true;
 
     this.cochesApi
-      .adminListar(forceRefresh)
+      .adminListar()
       .pipe(finalize(() => (this.cargando = false)))
       .subscribe({
         next: (data) => (this.coches = data ?? []),
         error: (e: any) => {
+          const status = Number(e?.status ?? 0);
+          const shouldRetry = !forceRefresh && (status === 0 || status === 401 || status === 403);
+          if (shouldRetry) {
+            this.cargar(true);
+            return;
+          }
           this.error = `Error cargando coches: ${e?.status ?? ''} ${e?.statusText ?? ''}`.trim();
           console.error(e);
         },

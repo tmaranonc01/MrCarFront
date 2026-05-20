@@ -25,7 +25,7 @@ export class Deseos implements OnInit {
     this.cargar();
   }
 
-  cargar() {
+  cargar(forceRefresh = false) {
     this.error = '';
     this.cargando = true;
 
@@ -35,6 +35,12 @@ export class Deseos implements OnInit {
       .subscribe({
         next: (data) => (this.deseos = data ?? []),
         error: (e: any) => {
+          const status = Number(e?.status ?? 0);
+          const shouldRetry = !forceRefresh && (status === 0 || status === 401 || status === 403);
+          if (shouldRetry) {
+            this.cargar(true);
+            return;
+          }
           this.error = `Error cargando deseos: ${e?.status ?? ''} ${e?.statusText ?? ''}`.trim();
           console.error(e);
         },

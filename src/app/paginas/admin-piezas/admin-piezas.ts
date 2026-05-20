@@ -79,22 +79,28 @@ export class AdminPiezas implements OnInit {
   cargarTodo(forceRefresh = false) {
     this.error = '';
     this.cargando = true;
-    this.cochesOpciones = this.coches.map(c => ({
-  label: this.etiquetaCoche(c),
-  value: c.id
-}));
 
     forkJoin({
-      piezas: this.piezasApi.adminListar(forceRefresh),
-      coches: this.cochesApi.adminListar(forceRefresh),
+      piezas: this.piezasApi.adminListar(),
+      coches: this.cochesApi.adminListar(),
     })
       .pipe(finalize(() => (this.cargando = false)))
       .subscribe({
         next: ({ piezas, coches }) => {
           this.piezas = piezas ?? [];
           this.coches = coches ?? [];
+          this.cochesOpciones = this.coches.map(c => ({
+            label: this.etiquetaCoche(c),
+            value: c.id
+          }));
         },
         error: (e: any) => {
+          const status = Number(e?.status ?? 0);
+          const shouldRetry = !forceRefresh && (status === 0 || status === 401 || status === 403);
+          if (shouldRetry) {
+            this.cargarTodo(true);
+            return;
+          }
           this.error = `Error cargando datos: ${e?.status ?? ''} ${e?.statusText ?? ''}`.trim();
           console.error(e);
         },
