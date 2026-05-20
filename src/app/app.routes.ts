@@ -7,6 +7,8 @@ import { AdminCoches } from './paginas/admin-coches/admin-coches';
 import { AdminPiezas } from './paginas/admin-piezas/admin-piezas';
 import { Registro } from './paginas/registro/registro';
 import { Home } from './paginas/home/home';
+import { soloLogueadoGuard } from './guards/solo-logueado-guard';
+import { soloAdminGuard } from './guards/solo-admin-guard';
 
 
 export const routes: Routes = [
@@ -15,10 +17,10 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'registro', component: Registro },
 
-   { path: 'deseos', component: Deseos },
+  { path: 'deseos', component: Deseos, canActivate: [soloLogueadoGuard] },
 
-  { path: 'admin/coches', component: AdminCoches },
-  { path: 'admin/piezas', component: AdminPiezas },
+  { path: 'admin/coches', component: AdminCoches, canActivate: [soloAdminGuard] },
+  { path: 'admin/piezas', component: AdminPiezas, canActivate: [soloAdminGuard] },
 
   { path: 'piezas', component: Piezas },
   { path: 'piezas/:id', component: PiezaDetalle },

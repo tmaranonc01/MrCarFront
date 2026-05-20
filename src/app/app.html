@@ -3,34 +3,28 @@
     <a class="nav-btn" routerLink="/">Inicio</a>
     <a class="nav-btn" routerLink="/piezas">Piezas</a>
 
-    <button
+    <a
       *ngIf="token.isLoggedSignal()"
-      type="button"
       class="nav-btn"
-      (touchend)="goAutoDouble('/deseos', $event)"
-      (click)="goAutoDouble('/deseos', $event)"
+      routerLink="/deseos"
     >
       Deseos
-    </button>
+    </a>
 
-    <button
+    <a
       *ngIf="token.isAdminSignal()"
-      type="button"
       class="nav-btn"
-      (touchend)="goAutoDouble('/admin/coches', $event)"
-      (click)="goAutoDouble('/admin/coches', $event)"
+      routerLink="/admin/coches"
     >
       Admin coches
-    </button>
-    <button
+    </a>
+    <a
       *ngIf="token.isAdminSignal()"
-      type="button"
       class="nav-btn"
-      (touchend)="goAutoDouble('/admin/piezas', $event)"
-      (click)="goAutoDouble('/admin/piezas', $event)"
+      routerLink="/admin/piezas"
     >
       Admin piezas
-    </button>
+    </a>
   </div>
 
   <div class="top-nav-end">
