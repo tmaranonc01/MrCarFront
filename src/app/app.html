@@ -1,14 +1,14 @@
 <p-toolbar>
   <ng-template pTemplate="start">
     <div class="top-nav-start">
-      <button type="button" class="nav-btn" (click)="go('/')">Inicio</button>
-      <button type="button" class="nav-btn" (click)="go('/piezas')">Piezas</button>
+      <button type="button" class="nav-btn" routerLink="/">Inicio</button>
+      <button type="button" class="nav-btn" routerLink="/piezas">Piezas</button>
 
       <button
         *ngIf="token.isLoggedSignal()"
         type="button"
         class="nav-btn"
-        (click)="go('/deseos')"
+        routerLink="/deseos"
       >
         Deseos
       </button>
@@ -17,7 +17,7 @@
         *ngIf="token.isAdminSignal()"
         type="button"
         class="nav-btn"
-        (click)="go('/admin/coches')"
+        routerLink="/admin/coches"
       >
         Admin coches
       </button>
@@ -25,7 +25,7 @@
         *ngIf="token.isAdminSignal()"
         type="button"
         class="nav-btn"
-        (click)="go('/admin/piezas')"
+        routerLink="/admin/piezas"
       >
         Admin piezas
       </button>
@@ -41,8 +41,8 @@
       </ng-container>
 
       <ng-template #noLogin>
-        <button type="button" class="nav-btn nav-btn-outline" (click)="go('/login')">Login</button>
-        <button type="button" class="nav-btn nav-btn-outline" (click)="go('/registro')">Registro</button>
+        <button type="button" class="nav-btn nav-btn-outline" routerLink="/login">Login</button>
+        <button type="button" class="nav-btn nav-btn-outline" routerLink="/registro">Registro</button>
       </ng-template>
     </div>
   </ng-template>
