@@ -85,10 +85,12 @@ a {
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.nav-btn:hover {
-  background: rgba(235, 94, 40, 0.12);
-  border-color: rgba(235, 94, 40, 0.34);
-  color: #181f29;
+@media (hover: hover) and (pointer: fine) {
+  .nav-btn:hover {
+    background: rgba(235, 94, 40, 0.12);
+    border-color: rgba(235, 94, 40, 0.34);
+    color: #181f29;
+  }
 }
 
 .nav-btn:focus-visible {

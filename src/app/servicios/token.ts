@@ -52,13 +52,22 @@ export class TokenService {
     return rol === 'ADMIN' || rol === 'ROLE_ADMIN';
   });
 
+  constructor() {
+    // Sincroniza cambios de token entre pestañas/ventanas.
+    window.addEventListener('storage', (event: StorageEvent) => {
+      if (event.key === KEY_TOKEN) {
+        this.syncTokenFromStorage();
+      }
+    });
+  }
+
   private normalizeToken(token: string | null): string | null {
     if (!token) return null;
 
-    const clean = token.trim();
+    const clean = token.trim().replace(/^['"]+|['"]+$/g, '');
     if (!clean || clean === 'null' || clean === 'undefined') return null;
 
-    return clean.toLowerCase().startsWith('bearer ') ? clean.slice(7).trim() : clean;
+    return clean.replace(/^bearer\s+/i, '').trim();
   }
 
   private isExpired(payload: any | null): boolean {
@@ -80,7 +89,15 @@ export class TokenService {
     return token;
   }
 
+  private syncTokenFromStorage() {
+    const fromStorage = this.readTokenFromStorage();
+    if (fromStorage !== this._token()) {
+      this._token.set(fromStorage);
+    }
+  }
+
   getToken(): string | null {
+    this.syncTokenFromStorage();
     return this._token();
   }
 
@@ -107,18 +124,22 @@ export class TokenService {
   }
 
   isLogged(): boolean {
+    this.syncTokenFromStorage();
     return this.isLoggedSignal();
   }
 
   getEmail(): string | null {
+    this.syncTokenFromStorage();
     return this.emailSignal(); // en tu back: subject = email
   }
 
   getRol(): string | null {
+    this.syncTokenFromStorage();
     return this.rolSignal();
   }
 
   isAdmin(): boolean {
+    this.syncTokenFromStorage();
     return this.isAdminSignal();
   }
 }
