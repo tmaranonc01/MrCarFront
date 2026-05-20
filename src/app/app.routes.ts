@@ -9,6 +9,7 @@ import { Registro } from './paginas/registro/registro';
 import { Home } from './paginas/home/home';
 import { soloLogueadoGuard } from './guards/solo-logueado-guard';
 import { soloAdminGuard } from './guards/solo-admin-guard';
+import { deseosResolver } from './resolvers/deseos-resolver';
 
 
 export const routes: Routes = [
@@ -17,7 +18,12 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'registro', component: Registro },
 
-  { path: 'deseos', component: Deseos, canActivate: [soloLogueadoGuard] },
+  {
+    path: 'deseos',
+    component: Deseos,
+    canActivate: [soloLogueadoGuard],
+    resolve: { deseos: deseosResolver },
+  },
 
   { path: 'admin/coches', component: AdminCoches, canActivate: [soloAdminGuard] },
   { path: 'admin/piezas', component: AdminPiezas, canActivate: [soloAdminGuard] },
