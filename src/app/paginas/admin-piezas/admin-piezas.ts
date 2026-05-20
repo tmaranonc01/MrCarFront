@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 
 import { PiezasService, Pieza, PiezaCrearActualizar, EstadoPieza } from '../../servicios/piezas';
 import { CochesService, Coche } from '../../servicios/coches';
+import { AdminPiezasResolvedData } from '../../resolvers/admin-piezas-resolver';
 
 // PrimeNG
 import { TableModule } from 'primeng/table';
@@ -41,6 +43,7 @@ import { SelectModule } from 'primeng/select';
 })
 export class AdminPiezas implements OnInit {
   private readonly maxIntentosCarga = 10;
+  private readonly maxIntentosVacio = 8;
 
   piezas: Pieza[] = [];
   coches: Coche[] = [];
@@ -71,11 +74,21 @@ export class AdminPiezas implements OnInit {
   constructor(
     private piezasApi: PiezasService,
     private cochesApi: CochesService,
-    private confirm: ConfirmationService
+    private confirm: ConfirmationService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
-    this.cargarTodo();
+    const resueltos = (this.route.snapshot.data['adminPiezas'] as AdminPiezasResolvedData | undefined) ?? {
+      piezas: [],
+      coches: [],
+    };
+
+    this.aplicarDatos(resueltos.piezas, resueltos.coches);
+
+    if (resueltos.piezas.length === 0 && resueltos.coches.length === 0) {
+      this.cargarTodo();
+    }
   }
 
   cargarTodo(intento = 0) {
@@ -89,12 +102,14 @@ export class AdminPiezas implements OnInit {
       .pipe(finalize(() => (this.cargando = false)))
       .subscribe({
         next: ({ piezas, coches }) => {
-          this.piezas = piezas ?? [];
-          this.coches = coches ?? [];
-          this.cochesOpciones = this.coches.map(c => ({
-            label: this.etiquetaCoche(c),
-            value: c.id
-          }));
+          this.aplicarDatos(piezas, coches);
+
+          const vacio = this.piezas.length === 0 && this.coches.length === 0;
+          if (vacio && intento < this.maxIntentosVacio) {
+            const waitMs = Math.min(900 + intento * 600, 2600);
+            this.cargando = true;
+            setTimeout(() => this.cargarTodo(intento + 1), waitMs);
+          }
         },
         error: (e: any) => {
           const status = Number(e?.status ?? 0);
@@ -113,6 +128,15 @@ export class AdminPiezas implements OnInit {
           console.error(e);
         },
       });
+  }
+
+  private aplicarDatos(piezas?: Pieza[] | null, coches?: Coche[] | null) {
+    this.piezas = piezas ?? [];
+    this.coches = coches ?? [];
+    this.cochesOpciones = this.coches.map(c => ({
+      label: this.etiquetaCoche(c),
+      value: c.id,
+    }));
   }
 
   etiquetaCoche(c: Coche) {

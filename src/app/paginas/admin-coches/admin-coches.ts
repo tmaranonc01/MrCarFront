@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import { CochesService, Coche, CocheCrearActualizar } from '../../servicios/coches';
 
@@ -34,6 +36,7 @@ import { ConfirmationService } from 'primeng/api';
 })
 export class AdminCoches implements OnInit {
   private readonly maxIntentosCarga = 10;
+  private readonly maxIntentosVacio = 8;
 
   coches: Coche[] = [];
   cargando = false;
@@ -49,38 +52,79 @@ export class AdminCoches implements OnInit {
     motor: null,
   };
 
-  constructor(private cochesApi: CochesService, private confirm: ConfirmationService) {}
+  constructor(
+    private cochesApi: CochesService,
+    private confirm: ConfirmationService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
-    this.cargar();
+    const resueltos = (this.route.snapshot.data['coches'] as Coche[] | undefined) ?? [];
+    this.coches = resueltos;
+
+    if (resueltos.length === 0) {
+      this.cargar();
+    }
   }
 
-  cargar(intento = 0) {
+  private wait(ms: number) {
+    return new Promise<void>(resolve => setTimeout(resolve, ms));
+  }
+
+  private isTransientStatus(status: number): boolean {
+    return status === 0 || status === 401 || status === 403 || status >= 500;
+  }
+
+  private async listarUnaVez(): Promise<Coche[]> {
+    return (await firstValueFrom(this.cochesApi.adminListar())) ?? [];
+  }
+
+  async cargar() {
     this.error = '';
-    if (intento === 0) this.cargando = true;
+    this.cargando = true;
+    let vaciosSeguidos = 0;
 
-    this.cochesApi
-      .adminListar()
-      .pipe(finalize(() => (this.cargando = false)))
-      .subscribe({
-        next: (data) => (this.coches = data ?? []),
-        error: (e: any) => {
-          const status = Number(e?.status ?? 0);
-          const shouldRetry =
-            intento < this.maxIntentosCarga &&
-            (status === 0 || status === 401 || status === 403 || status >= 500);
+    for (let intento = 0; intento <= this.maxIntentosCarga; intento++) {
+      try {
+        const primera = await this.listarUnaVez();
+        if (primera.length > 0) {
+          this.coches = primera;
+          this.cargando = false;
+          return;
+        }
 
-          if (shouldRetry) {
-            const waitMs = Math.min(1000 + intento * 700, 4500);
-            this.cargando = true;
-            setTimeout(() => this.cargar(intento + 1), waitMs);
-            return;
-          }
+        // Emula automaticamente el "segundo click".
+        await this.wait(350);
+        const segunda = await this.listarUnaVez();
+        if (segunda.length > 0) {
+          this.coches = segunda;
+          this.cargando = false;
+          return;
+        }
 
-          this.error = `Error cargando coches: ${e?.status ?? ''} ${e?.statusText ?? ''}`.trim();
+        vaciosSeguidos += 1;
+        if (vaciosSeguidos > this.maxIntentosVacio) {
+          this.coches = [];
+          this.cargando = false;
+          return;
+        }
+      } catch (e: unknown) {
+        const status = e instanceof HttpErrorResponse ? e.status : 0;
+        const shouldRetry = intento < this.maxIntentosCarga && this.isTransientStatus(status);
+
+        if (!shouldRetry) {
+          const statusText = e instanceof HttpErrorResponse ? e.statusText : '';
+          this.error = `Error cargando coches: ${status} ${statusText}`.trim();
+          this.cargando = false;
           console.error(e);
-        },
-      });
+          return;
+        }
+      }
+
+      await this.wait(Math.min(1000 + intento * 650, 4500));
+    }
+
+    this.cargando = false;
   }
 
   nuevo() {

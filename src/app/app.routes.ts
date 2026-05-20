@@ -10,6 +10,8 @@ import { Home } from './paginas/home/home';
 import { soloLogueadoGuard } from './guards/solo-logueado-guard';
 import { soloAdminGuard } from './guards/solo-admin-guard';
 import { deseosResolver } from './resolvers/deseos-resolver';
+import { adminCochesResolver } from './resolvers/admin-coches-resolver';
+import { adminPiezasResolver } from './resolvers/admin-piezas-resolver';
 
 
 export const routes: Routes = [
@@ -25,8 +27,18 @@ export const routes: Routes = [
     resolve: { deseos: deseosResolver },
   },
 
-  { path: 'admin/coches', component: AdminCoches, canActivate: [soloAdminGuard] },
-  { path: 'admin/piezas', component: AdminPiezas, canActivate: [soloAdminGuard] },
+  {
+    path: 'admin/coches',
+    component: AdminCoches,
+    canActivate: [soloAdminGuard],
+    resolve: { coches: adminCochesResolver },
+  },
+  {
+    path: 'admin/piezas',
+    component: AdminPiezas,
+    canActivate: [soloAdminGuard],
+    resolve: { adminPiezas: adminPiezasResolver },
+  },
 
   { path: 'piezas', component: Piezas },
   { path: 'piezas/:id', component: PiezaDetalle },
