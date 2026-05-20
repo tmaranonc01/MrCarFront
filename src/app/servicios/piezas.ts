@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, Observable, throwError } from 'rxjs';
 
 export type EstadoPieza = 'NUEVA' | 'REACONDICIONADA' | 'USADA';
 
@@ -58,8 +58,15 @@ export class PiezasService {
 
   // Admin
   adminListar(): Observable<Pieza[]> {
-    // En admin forzamos no-cache para evitar respuestas stale entre sesiones/roles.
-    return this.http.get<Pieza[]>(this.withNoCache(this.adminUrl, true));
+    // Compatibilidad con backends que no exponen GET en /admin/piezas.
+    return this.http.get<Pieza[]>(this.withNoCache(this.adminUrl, true)).pipe(
+      catchError((e: HttpErrorResponse) => {
+        if (e.status === 403 || e.status === 405) {
+          return this.listar(true);
+        }
+        return throwError(() => e);
+      })
+    );
   }
 
   adminCrear(p: PiezaCrearActualizar): Observable<Pieza> {
