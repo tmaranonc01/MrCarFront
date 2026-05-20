@@ -5,7 +5,7 @@
       <button type="button" class="nav-btn" (click)="go('/piezas')">Piezas</button>
 
       <button
-        *ngIf="token.isLogged()"
+        *ngIf="token.isLoggedSignal()"
         type="button"
         class="nav-btn"
         (click)="go('/deseos')"
@@ -14,7 +14,7 @@
       </button>
 
       <button
-        *ngIf="token.isAdmin()"
+        *ngIf="token.isAdminSignal()"
         type="button"
         class="nav-btn"
         (click)="go('/admin/coches')"
@@ -22,7 +22,7 @@
         Admin coches
       </button>
       <button
-        *ngIf="token.isAdmin()"
+        *ngIf="token.isAdminSignal()"
         type="button"
         class="nav-btn"
         (click)="go('/admin/piezas')"
@@ -34,9 +34,9 @@
 
   <ng-template pTemplate="end">
     <div class="top-nav-end">
-      <ng-container *ngIf="token.isLogged(); else noLogin">
-        <span class="user-email">{{ token.getEmail() }}</span>
-        <p-tag [value]="token.getRol() || ''" severity="info"></p-tag>
+      <ng-container *ngIf="token.isLoggedSignal(); else noLogin">
+        <span class="user-email">{{ token.emailSignal() }}</span>
+        <p-tag [value]="token.rolSignal() || ''" severity="info"></p-tag>
         <button type="button" class="nav-btn" (click)="logout()">Salir</button>
       </ng-container>
 
