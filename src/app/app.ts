@@ -2,13 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { TokenService } from './servicios/token';
-import { ToolbarModule } from 'primeng/toolbar';
 import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, ToolbarModule, TagModule],
+  imports: [CommonModule, RouterOutlet, RouterLink, TagModule],
   templateUrl: './app.html',
 })
 export class App {

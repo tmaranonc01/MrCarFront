@@ -1,52 +1,45 @@
-<p-toolbar>
-  <ng-template pTemplate="start">
-    <div class="top-nav-start">
-      <button type="button" class="nav-btn" routerLink="/">Inicio</button>
-      <button type="button" class="nav-btn" routerLink="/piezas">Piezas</button>
+<header class="top-toolbar">
+  <div class="top-nav-start">
+    <a class="nav-btn" routerLink="/">Inicio</a>
+    <a class="nav-btn" routerLink="/piezas">Piezas</a>
 
-      <button
-        *ngIf="token.isLoggedSignal()"
-        type="button"
-        class="nav-btn"
-        routerLink="/deseos"
-      >
-        Deseos
-      </button>
+    <a
+      *ngIf="token.isLoggedSignal()"
+      class="nav-btn"
+      routerLink="/deseos"
+    >
+      Deseos
+    </a>
 
-      <button
-        *ngIf="token.isAdminSignal()"
-        type="button"
-        class="nav-btn"
-        routerLink="/admin/coches"
-      >
-        Admin coches
-      </button>
-      <button
-        *ngIf="token.isAdminSignal()"
-        type="button"
-        class="nav-btn"
-        routerLink="/admin/piezas"
-      >
-        Admin piezas
-      </button>
-    </div>
-  </ng-template>
+    <a
+      *ngIf="token.isAdminSignal()"
+      class="nav-btn"
+      routerLink="/admin/coches"
+    >
+      Admin coches
+    </a>
+    <a
+      *ngIf="token.isAdminSignal()"
+      class="nav-btn"
+      routerLink="/admin/piezas"
+    >
+      Admin piezas
+    </a>
+  </div>
 
-  <ng-template pTemplate="end">
-    <div class="top-nav-end">
-      <ng-container *ngIf="token.isLoggedSignal(); else noLogin">
-        <span class="user-email">{{ token.emailSignal() }}</span>
-        <p-tag [value]="token.rolSignal() || ''" severity="info"></p-tag>
-        <button type="button" class="nav-btn" (click)="logout()">Salir</button>
-      </ng-container>
+  <div class="top-nav-end">
+    <ng-container *ngIf="token.isLoggedSignal(); else noLogin">
+      <span class="user-email">{{ token.emailSignal() }}</span>
+      <p-tag [value]="token.rolSignal() || ''" severity="info"></p-tag>
+      <button type="button" class="nav-btn" (click)="logout()">Salir</button>
+    </ng-container>
 
-      <ng-template #noLogin>
-        <button type="button" class="nav-btn nav-btn-outline" routerLink="/login">Login</button>
-        <button type="button" class="nav-btn nav-btn-outline" routerLink="/registro">Registro</button>
-      </ng-template>
-    </div>
-  </ng-template>
-</p-toolbar>
+    <ng-template #noLogin>
+      <a class="nav-btn nav-btn-outline" routerLink="/login">Login</a>
+      <a class="nav-btn nav-btn-outline" routerLink="/registro">Registro</a>
+    </ng-template>
+  </div>
+</header>
 
 <div class="app-content">
   <router-outlet></router-outlet>

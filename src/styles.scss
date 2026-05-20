@@ -32,12 +32,18 @@ a {
   color: #1c4f84;
 }
 
-.p-toolbar {
+.top-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
   margin: 12px 12px 0;
   border: 1px solid var(--mc-line);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(4px);
+  padding: 0.6rem 0.75rem;
 }
 
 .top-nav-start,
@@ -64,6 +70,9 @@ a {
 }
 
 .nav-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
   background: transparent;
   border: 1px solid transparent;
   color: #2b3643;
@@ -257,17 +266,13 @@ a {
 }
 
 @media (max-width: 760px) {
-  .p-toolbar {
+  .top-toolbar {
     margin: 8px 8px 0;
-  }
-
-  .p-toolbar .p-toolbar-start,
-  .p-toolbar .p-toolbar-end {
-    width: 100%;
   }
 
   .top-nav-end {
     justify-content: flex-start;
+    width: 100%;
   }
 
   .user-email {
