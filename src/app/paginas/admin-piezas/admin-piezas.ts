@@ -222,7 +222,7 @@ export class AdminPiezas implements OnInit {
 
   borrar(id: number) {
     this.piezasApi.adminBorrar(id).subscribe({
-      next: () => this.cargarTodo(),
+      next: () => window.location.reload(),
       error: (e: any) => {
         this.error = `Error borrando pieza: ${e?.status ?? ''} ${e?.statusText ?? ''}`.trim();
         console.error(e);

@@ -104,8 +104,8 @@ export class Deseos implements OnInit {
 
     this.deseosService.quitar(piezaId).subscribe({
       next: () => {
-        // quitamos en memoria sin recargar toda la página
-        this.deseos = this.deseos.filter(d => d.pieza?.id !== piezaId);
+        // recargamos para reflejar el cambio inmediatamente
+        window.location.reload();
       },
       error: (e: any) => {
         this.error = `Error quitando deseo: ${e?.status ?? ''} ${e?.statusText ?? ''}`.trim();

@@ -75,20 +75,32 @@ export class AdminCoches implements OnInit {
     return status === 0 || status === 401 || status === 403 || status >= 500;
   }
 
+  private idsCoinciden(a: unknown, b: unknown): boolean {
+    return String(a ?? '') === String(b ?? '');
+  }
+
   private async listarUnaVez(): Promise<Coche[]> {
     return (await firstValueFrom(this.cochesApi.adminListar())) ?? [];
   }
 
-  async cargar() {
+  async cargar(idBorradoEsperado?: number) {
     this.error = '';
     this.cargando = true;
     let vaciosSeguidos = 0;
+    const esperandoBorrado = typeof idBorradoEsperado === 'number';
+    const contieneBorradoEsperado = (lista: Coche[]) =>
+      esperandoBorrado && lista.some(c => this.idsCoinciden(c.id, idBorradoEsperado));
 
     for (let intento = 0; intento <= this.maxIntentosCarga; intento++) {
       try {
         const primera = await this.listarUnaVez();
-        if (primera.length > 0) {
+        if (primera.length > 0 && !contieneBorradoEsperado(primera)) {
           this.coches = primera;
+          this.cargando = false;
+          return;
+        }
+        if (primera.length === 0 && esperandoBorrado) {
+          this.coches = [];
           this.cargando = false;
           return;
         }
@@ -96,14 +108,19 @@ export class AdminCoches implements OnInit {
         // Emula automaticamente el "segundo click".
         await this.wait(350);
         const segunda = await this.listarUnaVez();
-        if (segunda.length > 0) {
+        if (segunda.length > 0 && !contieneBorradoEsperado(segunda)) {
           this.coches = segunda;
+          this.cargando = false;
+          return;
+        }
+        if (segunda.length === 0 && esperandoBorrado) {
+          this.coches = [];
           this.cargando = false;
           return;
         }
 
         vaciosSeguidos += 1;
-        if (vaciosSeguidos > this.maxIntentosVacio) {
+        if (!esperandoBorrado && vaciosSeguidos > this.maxIntentosVacio) {
           this.coches = [];
           this.cargando = false;
           return;
@@ -193,7 +210,10 @@ export class AdminCoches implements OnInit {
     this.error = '';
 
     this.cochesApi.adminBorrar(id).subscribe({
-      next: () => this.cargar(),
+      next: () => {
+        this.coches = this.coches.filter(c => !this.idsCoinciden(c.id, id));
+        window.location.reload();
+      },
       error: (e: any) => {
         this.error = `Error borrando coche: ${e?.status ?? ''} ${e?.statusText ?? ''}`.trim();
         console.error(e);

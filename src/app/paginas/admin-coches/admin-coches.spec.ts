@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
 import { AdminCoches } from './admin-coches';
 
@@ -8,7 +10,20 @@ describe('AdminCoches', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminCoches]
+      imports: [AdminCoches],
+      providers: [
+        provideHttpClient(),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              data: {
+                coches: [{ id: 1, marca: 'Seat', modelo: 'Ibiza' }],
+              },
+            },
+          },
+        },
+      ],
     })
     .compileComponents();
 
